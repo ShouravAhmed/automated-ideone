@@ -57,16 +57,32 @@ def handle_code(code):
 	print("----------------------------------------------------\n")
 	
 	choose = input("__ ")
-	if choose == "" or int(choose) == 3:
+	try:
+		if choose == "" or int(choose) == 3:
+			return
+		choose = int(choose)
+	except:
 		return
-	choose = int(choose)
 
 	if choose == 1:
 		webbrowser.open(home_page+code[0])
-	else:
-		print("Download\n")
-		input("__ ")
-
+	elif choose == 2:
+		try:
+			usr.download(code[0], code[1], code[4])
+			clear()
+			header()
+			print("----------------------------------------------------\n")
+			print("Code saved in:", usr.current_dir()+"/downloads/\n")
+			print("----------------------------------------------------\n")
+			input(".\n.\npress enter to continue _ ")
+		except:
+			clear()
+			header()
+			print("----------------------------------------------------\n")
+			print("Error occured!! please try again.")
+			print("----------------------------------------------------\n")
+			input(".\n.\npress enter to continue _ ")
+		
 
 def search_code(user_id):
 	clear()
@@ -117,7 +133,15 @@ def search_code(user_id):
 		handle_code(search_result[choose-1])
 
 def add_new_codes(log):
-	usr.add_new_codes(log, db)
+	try:
+		usr.add_new_codes(log, db)
+	except:
+		clear()
+		header()
+		print("----------------------------------------------------\n")
+		print("Error occured!! please try again.")
+		print("----------------------------------------------------\n")
+		input(".\n.\npress enter to continue _ ")
 
 def main():
 

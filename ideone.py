@@ -3,6 +3,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
+from urllib.request import urlopen as uReq, Request
 from bs4 import BeautifulSoup
 import pathlib
 import os
@@ -175,19 +176,30 @@ class ideone_automation(object):
 	def __file_entension(self, lang):
 		if 'py' in lang:
 			return '.py'
-		elif 'c' in lang or 'C' in lang:
+		elif 'c' in lang:
 			return '.cpp'
-		elif lang == 'bash':
+		elif 'sh' in lang:
 			return '.sh'
-		elif lang == 'java':
+		elif 'ja' in lang:
 			return '.java'
 
 	def download(self, link, name, lang):
-		self.__driver = webdriver.Chrome(executable_path=self.__chrome_driver, options=self.__options)
+		lang = lang.lower()
 
-		self.__driver.get(self.__home_page+link)
-		soup = BeautifulSoup(self.__driver.page_source, "lxml")
-		self.__driver.close()
+		my_url = self.__home_page+link
+		hdr = {'User-Agent': 'Mozilla/5.0'}
+
+		req = Request(my_url, headers=hdr)
+		html = uReq(req)
+		html = html.read().decode()
+
+		soup = BeautifulSoup(html, 'lxml')
+
+		# self.__driver = webdriver.Chrome(executable_path=self.__chrome_driver, options=self.__options)
+
+		# self.__driver.get(self.__home_page+link)
+		# soup = BeautifulSoup(self.__driver.page_source, "lxml")
+		# self.__driver.close()
 
 		data = soup.find('pre', {'class':'source', 'id':'source'})
 		data = data.find('ol')
@@ -198,6 +210,10 @@ class ideone_automation(object):
 			for i in data:
 				f.write(i)
 				f.write("\n")
+
+	def current_dir(self):
+		return self.__dir_path
+
 	#------------------------------------------------------------------------------------------------------------------
 	
 

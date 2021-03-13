@@ -105,7 +105,7 @@ class manage_db(object):
 					flg = 1;
 					break;
 			if flg:
-				ret.append([row[1], row[2], row[4], row[5]])
+				ret.append([row[1], row[2], row[4], row[5], row[3]])
 			# print(row)
 
 		return ret
