@@ -11,7 +11,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
 #------------------------------------------------------------------------------------------------
 
 class ideone_automation(object):
@@ -37,7 +36,12 @@ class ideone_automation(object):
 		self.__dir_path = str(pathlib.Path().absolute())
 		self.__chrome_driver = self.__dir_path + '/chromedriver'
 		self.__driver = None
-	
+		
+		self.__user_id = None
+		self.__username = None
+		self.__password = None
+		self.__db = None
+
 		self.__home_page = "https://ideone.com/"
 		self.__login_page = self.__home_page + "account/login/"
 
@@ -45,10 +49,10 @@ class ideone_automation(object):
 	# add new codes 
 	def __ideone_login(self):
 		usr = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div/form/div[1]/div/div/input")
-		usr.send_keys(self.__usrn)
+		usr.send_keys(self.__username)
 
 		pas = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div/form/div[2]/div/div/input")
-		pas.send_keys(self.__pasw)
+		pas.send_keys(self.__password)
 
 		lgn = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div/form/div[3]/div/button")
 		lgn.send_keys(Keys.RETURN)
@@ -89,7 +93,6 @@ class ideone_automation(object):
 
 		soup = BeautifulSoup(self.__driver.page_source, "lxml")
 		return self.__process_data(soup)
-		input("__ ")
 
 	def __page_count(self):
 		soup = BeautifulSoup(self.__driver.page_source, 'lxml')
@@ -107,6 +110,13 @@ class ideone_automation(object):
 
 			prob_tags = tr.find_all('a', {'class':'tag'})
 			prob_tags = [x.text.strip() for x in prob_tags]
+			s = ""
+			for x in prob_tags:
+				if s != "":
+					s += ", "
+				s += x;
+			prob_tags = s
+
 
 			prob_name = tr.find('span', {'class':'note_label'})
 			prob_name = prob_name.text.strip()
@@ -118,32 +128,40 @@ class ideone_automation(object):
 			prob_sub_date = prob_sub_date[1].get('title').strip()
 
 			ls = [prob_link, prob_tags, prob_name, prob_lang, prob_sub_date]
-			if ls[0] not in self.__codeset:
-				self.__codes.append(ls)
+			if self.__db.insert_code(ls, self.__user_id):
+				ok = 1
 			else:
 				return False
 		return True
 
-	def add_new_codes(self):
+	def add_new_codes(self, id, db):
 		self.__driver = webdriver.Chrome(executable_path=self.__chrome_driver, options=self.__options)
-
+		
+		self.__db = db
+		self.__user_id = id
+		self.__username = db.username(self.__user_id)
+		self.__password = db.password(self.__user_id)
+		
 		try:
 			self.__driver.get(self.__login_page)
 			self.__ideone_login()
 
 			total_page = self.__page_count()
 
-			for page_no in range(1, 101):
+			for page_no in range(1, total_page+1):
 				if not self.__get_data(str(page_no)):
 					os.system("clear")		
 					print(".\n.\n.\n.\n.\npage",page_no,"was previously processed.")
 					time.sleep(2)
-					break
+					break;
+		
 		except:
 			ok = 1
 		
 		self.__driver.close()
-		self.__save_data()	
+		db.update_total_page_loaded(total_page, id)
+		db.conn.commit()
+
 
 		os.system("clear")
 		print(".\n.\n.\n.\n.\nAll data processed!!")
