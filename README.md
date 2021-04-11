@@ -5,8 +5,8 @@
 [![GitHub forks](https://img.shields.io/github/forks/ShouravAhmed/automated-ideone.svg?style=social&label=Fork)](https://github.com/ShouravAhmed/automated-ideone)
 [![GitHub stars](https://img.shields.io/github/stars/ShouravAhmed/automated-ideone.svg?style=social&label=Stars)](https://github.com/ShouravAhmed/automated-ideone)
 
-[Ideone](https://www.ideone.com) is an online compiler and debugging tool which allows you to compile source code and execute it online in more than 60 programming languages and you can also save your code there.
-Many people like to save daily codes in Ideone as it is light and easy to use. People face a problem when they save a lot of codes then they cant find a spacific code instantly as there is no search search box in Ideone.
+[Ideone](https://www.ideone.com) is an online compiler and debugging tool which allows you to compile source code and execute it online in more than 60 programming languages and you can also save your code there.\
+Many people like to save daily codes in Ideone as it is light and easy to use. People face a problem when they save a lot of codes then they cant find a spacific code instantly as there is no search search box in Ideone.\
 In this project we simply automated this searching and implement some other tool to make life easier.
 
 ### Features
