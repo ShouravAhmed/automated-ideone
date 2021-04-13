@@ -21,7 +21,7 @@ In this project we simply automated this searching and implement some other tool
 
 1. First download/clone this repository from github.
 3. As this project is based on chrome driver you must need to have installed [Chrome Web Browser](https://www.google.com/chrome/)
-4. Replace the ```chromedriver``` file in the project repository by downloading a [chromedriver](https://chromedriver.chromium.org/downloads) with the same version as your chrome web borowser.
+4. Replace the ```chromedriver``` file in the downloaded project directory by downloading a [chromedriver](https://chromedriver.chromium.org/downloads) with the same version as your chrome web borowser.
 5. You should have python installed in your system.
 6. Install the project dependencies, you can find them in ```requirements.txt```. If you have ```pip``` Then you can installl them by writing ```pip install -r requirements.txt``` on terminal. This should install the dependencies/packages.
 7. Run the ```main.py``` by writing ```python3 main.py``` from terminal or however you can.
