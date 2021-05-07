@@ -11,7 +11,7 @@ usr = ideone_automation()
 db = manage_db()
 
 home_page = "https://ideone.com/"
-	
+
 def header():
 	print("----------------------------------------------------\n")
 	print("----------------- Automated Ideone -----------------\n")
@@ -28,7 +28,7 @@ def check_login():
 		while True:
 			clear()
 			header()
-			print("1. Login\n2. Back")	
+			print("1. Login\n2. Back")
 			print("----------------------------------------------------\n")
 			choose = input("__ ")
 			if choose == "" or int(choose) == 2:
@@ -51,22 +51,24 @@ def handle_code(code):
 	print("Tag:  ", code[3])
 	print("Date: ", code[2].split()[0])
 	print("----------------------------------------------------\n")
-	print("1. Open in Browser")
-	print("2. Download the Code")
-	print("3. Back")
+
+	print("1. Download the Code")
+	print("2. Open in Browser")
+	print("3. Submit in vjudge")
+	print("4. Back")
 	print("----------------------------------------------------\n")
-	
+
 	choose = input("__ ")
 	try:
-		if choose == "" or int(choose) == 3:
+		if choose == "" or int(choose) == 4:
 			return
 		choose = int(choose)
 	except:
 		return
 
-	if choose == 1:
+	if choose == 2:
 		webbrowser.open(home_page+code[0])
-	elif choose == 2:
+	elif choose == 1:
 		try:
 			usr.download(code[0], code[1], code[4])
 			clear()
@@ -82,7 +84,12 @@ def handle_code(code):
 			print("Error occured!! please try again.")
 			print("----------------------------------------------------\n")
 			input(".\n.\npress enter to continue _ ")
-		
+	elif choose == 3:
+		webbrowser.open(home_page+code[0])
+		webbrowser.open("https://www.google.com/search?q=vjudge+"+code[1].replace(' ','+'))
+
+	handle_code(code)
+
 
 def search_code(user_id):
 	clear()
@@ -122,10 +129,10 @@ def search_code(user_id):
 
 			print(p4)
 
-		print("----------------------------------------------------")		
+		print("----------------------------------------------------")
 		print(str(len(search_result)+1)+'. Back')
 		print("----------------------------------------------------\n")
-		
+
 		choose = input("__ ")
 		if choose == "" or int(choose) == len(search_result)+1:
 			return
