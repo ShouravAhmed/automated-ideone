@@ -204,7 +204,7 @@ class ideone_automation(object):
 		data = soup.find('pre', {'class':'source', 'id':'source'})
 		data = data.find('ol')
 		data = data.find_all('li')
-		data = [x.text for x in data]
+		data = [x.text.strip() for x in data]
 
 		with open(self.__dir_path+"/downloads/"+name+self.__file_entension(lang), 'w') as f:
 			for i in data:
