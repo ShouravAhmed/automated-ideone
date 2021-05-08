@@ -3,13 +3,13 @@ import time
 
 class manage_db(object):
 	def __init__(self):
-		
+
 		self.conn = sqlite3.connect("ideone_db.sqlite")
 		self.cur = self.conn.cursor()
-		
+
 		self.cur.execute("select count(*) from sqlite_master where type='table' and name = 'user'")
 		row = self.cur.fetchone()
-		
+
 		if row[0] == 0:
 			self.cur.execute('''
 				create table user (
@@ -42,13 +42,13 @@ class manage_db(object):
 
 		self.cur.execute("select count(*) from codes where link = ?", (code[0], ))
 		row = self.cur.fetchone()
-		
+
 		if row[0] == 0:
 
 			self.cur.execute('''
-				insert into codes (link, tag, name, lang, submission_date, user_id) 
-				values(?, ?, ?, ?, ?, ?)''', 
-				(str(code[0]), str(code[1]), str(code[2]), str(code[3]), str(code[4]), str(u_id),) 
+				insert into codes (link, tag, name, lang, submission_date, user_id)
+				values(?, ?, ?, ?, ?, ?)''',
+				(str(code[0]), str(code[1]), str(code[2]), str(code[3]), str(code[4]), str(u_id),)
 			)
 
 			print("saving code :", code[0])
@@ -73,13 +73,13 @@ class manage_db(object):
 
 			self.cur.execute("select id from user where username = ? and password = ?;",(user[0], user[1], ))
 			row = self.cur.fetchone()
-			
+
 			self.conn.commit()
 			return row[0]
 
 	def update_total_page_loaded(self, page_cnt, id):
 		self.cur.execute("update user set total_page_loaded = ? where id = ?;",(page_cnt, id, ))
-		
+
 
 	def get_codes(self, search_text, user_id):
 		# condition = ""
@@ -98,16 +98,22 @@ class manage_db(object):
 		ret = []
 
 		for row in rows:
+			# print(row)
 			flg = 0
 			txt = row[2].lower()
+			tagtxt = row[5].lower()
+
 			for i in search_text:
 				if i in txt:
 					flg = 1;
 					break;
+				elif i in tagtxt:
+					flg = 1;
+					break;
 			if flg:
 				ret.append([row[1], row[2], row[4], row[5], row[3]])
-			# print(row)
 
+		# input()
 		return ret
 
 
@@ -131,14 +137,13 @@ class manage_db(object):
 	def username(self, id):
 		self.cur.execute("select username from user where id = ?", (id, ))
 		row = self.cur.fetchone()
-		
+
 		return row[0]
 
 	def password(self, id):
 		self.cur.execute("select password from user where id = ?", (id, ))
 		row = self.cur.fetchone()
-		
+
 		return row[0]
 
 # ----------------------------------------------------------------------------------------------
-	

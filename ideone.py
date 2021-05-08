@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
+
 #------------------------------------------------------------------------------------------------
 
 class ideone_automation(object):
@@ -37,7 +38,7 @@ class ideone_automation(object):
 		self.__dir_path = str(pathlib.Path().absolute())
 		self.__chrome_driver = self.__dir_path + '/chromedriver'
 		self.__driver = None
-		
+
 		self.__user_id = None
 		self.__username = None
 		self.__password = None
@@ -47,7 +48,7 @@ class ideone_automation(object):
 		self.__login_page = self.__home_page + "account/login/"
 
 	# -----------------------------------------------------------------------------------------------------------------
-	# add new codes 
+	# add new codes
 	def __ideone_login(self):
 		usr = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div/div/div/form/div[1]/div/div/input")
 		usr.send_keys(self.__username)
@@ -77,19 +78,54 @@ class ideone_automation(object):
 		print(".\n.\n.\n.\n.\npage limit 100 selected.")
 		time.sleep(1)
 
-
-	def __get_data(self, page_no):
-		page = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div[2]/div[2]/div[1]/div[1]/div/button")
-		page.click()
-
-		path = "/html/body/div[1]/div[3]/div[1]/div[2]/div[2]/div[1]/div[1]/div/ul/li["+page_no+"]/a"
-		page = self.__driver.find_element_by_xpath(path)
-		page.click()
+	def page_not_changed(self, page_no, soup, wait_sec):
+		cur_page = soup.find("button", class_="btn dropdown-toggle no-radius ")
+		cur_page = cur_page.text.strip()
 
 		os.system("clear")
-		print(".\n.\n.\n.\n.\nprocessing page",page_no,".....")
-		
-		time.sleep(10)
+		if wait_sec % 2 == 0:
+			print("-\-\-\-\-\- - ", end="")
+		else:
+			print("-/-/-/-/-/- - ", end="")
+		print("processing page no -", page_no, end = "")
+		if wait_sec % 2 == 0:
+			print(" - -/-/-/-/-/-")
+		else:
+			print(" - -\-\-\-\-\-")
+
+		if wait_sec % 2 == 0:
+			print("-\-\-\-\-\-\-\-\- - ", end="")
+		else:
+			print("-/-/-/-/-/-/-/-/- - ", end="")
+		print(int(wait_sec/3.33), "sec", end="")
+		if wait_sec % 2 == 0:
+			print(" - -/-/-/-/-/-/-/-/-")
+		else:
+			print(" - -\-\-\-\-\-\-\-\-")
+
+		if cur_page == page_no:
+			return False
+		return True
+
+	def __get_data(self, page_no):
+
+		if page_no != "1":
+
+			page = self.__driver.find_element_by_xpath("/html/body/div[1]/div[3]/div[1]/div[2]/div[2]/div[1]/div[1]/div/button")
+			page.click()
+
+			path = "/html/body/div[1]/div[3]/div[1]/div[2]/div[2]/div[1]/div[1]/div/ul/li["+page_no+"]/a"
+			page = self.__driver.find_element_by_xpath(path)
+			page.click()
+
+		os.system("clear")
+
+		start_time = time.time()
+		wait_sec = 0
+		while self.page_not_changed(page_no, BeautifulSoup(self.__driver.page_source, "lxml"), wait_sec):
+			time.sleep(0.3)
+			wait_sec += 1
+
 		#self.__driver.implicitly_wait(120)
 
 		soup = BeautifulSoup(self.__driver.page_source, "lxml")
@@ -104,7 +140,7 @@ class ideone_automation(object):
 
 	def __process_data(self, soup):
 		prob_info = soup.find_all('tr', {'class':'chk'})
-		
+
 		for tr in prob_info:
 			prob_link = tr.find('a', {'class':'link'})
 			prob_link = prob_link.text.strip()
@@ -118,7 +154,6 @@ class ideone_automation(object):
 				s += x;
 			prob_tags = s
 
-
 			prob_name = tr.find('span', {'class':'note_label'})
 			prob_name = prob_name.text.strip()
 
@@ -130,35 +165,44 @@ class ideone_automation(object):
 
 			ls = [prob_link, prob_tags, prob_name, prob_lang, prob_sub_date]
 			if self.__db.insert_code(ls, self.__user_id):
-				ok = 1
+				pass
 			else:
 				return False
 		return True
 
 	def add_new_codes(self, id, db):
 		self.__driver = webdriver.Chrome(executable_path=self.__chrome_driver, options=self.__options)
-		
+
 		self.__db = db
 		self.__user_id = id
 		self.__username = db.username(self.__user_id)
 		self.__password = db.password(self.__user_id)
-		
+		flg = 1
 		try:
+			os.system("clear")
+			print("\n\n\nPlease wait trying to login.\n\n\n")
 			self.__driver.get(self.__login_page)
 			self.__ideone_login()
-
-			total_page = self.__page_count()
-
-			for page_no in range(1, total_page+1):
-				if not self.__get_data(str(page_no)):
-					os.system("clear")		
-					print(".\n.\n.\n.\n.\npage",page_no,"was previously processed.")
-					time.sleep(2)
-					break;
-		
 		except:
-			ok = 1
-		
+			flg = 0
+			print("Can't login please try again.")
+			input("press enter to continue __ ")
+
+		if flg == 1:
+			try:
+				total_page = self.__page_count()
+
+				for page_no in range(1, total_page+1):
+					if not self.__get_data(str(page_no)):
+						os.system("clear")
+						print(".\n.\n.\n.\n.\npage",page_no,"was previously processed.")
+						time.sleep(2)
+						break;
+			except:
+				print("Can't load all codes please try again.")
+				input("press enter to continue __ ")
+
+
 		self.__driver.close()
 		db.update_total_page_loaded(total_page, id)
 		db.conn.commit()
@@ -215,9 +259,6 @@ class ideone_automation(object):
 		return self.__dir_path
 
 	#------------------------------------------------------------------------------------------------------------------
-	
+
 
 #------------------------------------------------------------------------------------------------
-
-
-

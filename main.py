@@ -6,6 +6,8 @@ import os
 import time
 import webbrowser
 
+from datetime import datetime
+
 
 usr = ideone_automation()
 db = manage_db()
@@ -97,6 +99,9 @@ def search_code(user_id):
 	search_text = input("Search : ")
 	search_result = db.get_codes(search_text, user_id)
 
+	search_result.sort(key = lambda code_data : code_data[2])
+	search_result.reverse()
+
 	while True:
 		clear()
 		header()
@@ -127,7 +132,7 @@ def search_code(user_id):
 			for j in range(c-len(p3)):
 				print(" ", end="")
 
-			print(p4)
+			print(p4.split()[0])
 
 		print("----------------------------------------------------")
 		print(str(len(search_result)+1)+'. Back')
@@ -183,4 +188,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
